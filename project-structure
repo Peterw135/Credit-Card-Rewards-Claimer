@@ -1,0 +1,11 @@
+my-extension/
+├── manifest.json
+├── popup.html
+├── popup.js
+├── modules/
+│   ├── chase.js
+│   └── chase.json
+└── icons/
+    ├── icon16.png
+    ├── icon64.png
+    └── icon128.png 
