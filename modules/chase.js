@@ -1,4 +1,4 @@
-import { sleep } from './helper.js';
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const config = {
   delay: 1000,
@@ -7,11 +7,13 @@ const config = {
 
 async function claimRewards() {
   await sleep(config.initialWait);
+  // Prompt To Run
+  if (!confirm('Are you sure you want to start claiming Chase rewards?')) {
+    return;
+  }
 
   // Click not added 
-  const checkbox = document.querySelector('mds-checkbox[label="Not added"][data-testid="Not added"]');
-  const shadowRoot = checkbox.shadowRoot;
-  const innerCheckbox = shadowRoot.querySelector('input[type="checkbox"]');
+  const innerCheckbox = document.querySelector('mds-checkbox[label="Not added"][data-testid="Not added"]')?.shadowRoot.querySelector('input[type="checkbox"]');
   innerCheckbox.click();
   await sleep(config.delay);
   
@@ -23,15 +25,15 @@ async function claimRewards() {
       break;
     }
     offerButtons[0].click();
-    await sleep(config.delay * 2);
+    await sleep(config.delay * 1);
 
     // Go back
-    const shadowHost = document.getElementById('mds-secondary-back-navbar');
-    const shadowRoot = shadowHost.shadowRoot;
-    const backButton = shadowRoot.querySelector('button#back-button');
+    const backButton = document.getElementById('mds-secondary-back-navbar')
+      ?.shadowRoot
+      .querySelector('button#back-button');
     backButton.click();
 
-    await sleep(config.delay * 5);
+    await sleep(config.delay * 3);
   }
 }
 
