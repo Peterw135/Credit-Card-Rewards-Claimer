@@ -1,45 +1,38 @@
+import { sleep } from './helper.js';
+
 const config = {
-  selectors: {
-    addButton: 'mds-icon[type="ico_add_circle"][data-testid="commerce-tile-button"]',
-    backButton: '#back-button'
-  },
   delay: 1000,
-  initialWait: 15000
+  initialWait: 5000
 };
 
 async function claimRewards() {
-  console.log('Waiting for page to load...');
-  await new Promise(resolve => setTimeout(resolve, config.initialWait));
-  
-  console.log('Checking for buttons...');
-  const buttons = document.querySelectorAll(config.selectors.addButton);
-  console.log('Found buttons:', buttons.length);
-  
-  for (const button of buttons) {
-    button.click();
-    await new Promise(resolve => setTimeout(resolve, config.delay * 5));
-    
-    console.log('Still Running');
-    const backButton = await waitForElement(config.selectors.backButton);
-    if (backButton) {
-      console.log('Back button found');
-      backButton.click();
-      await new Promise(resolve => setTimeout(resolve, config.delay));
-    }
-  }
-}
+  await sleep(config.initialWait);
 
-async function waitForElement(selector) {
-  return new Promise(resolve => {
-    const observer = new MutationObserver(() => {
-      const element = document.querySelector(selector);
-      if (element) {
-        observer.disconnect();
-        resolve(element);
-      }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-  });
+  // Click not added 
+  const checkbox = document.querySelector('mds-checkbox[label="Not added"][data-testid="Not added"]');
+  const shadowRoot = checkbox.shadowRoot;
+  const innerCheckbox = shadowRoot.querySelector('input[type="checkbox"]');
+  innerCheckbox.click();
+  await sleep(config.delay);
+  
+  while (true) {
+    // Claim Reward
+    const gridContainer = document.querySelector('[data-testid="offerTileGridContainer"]');
+    const offerButtons = gridContainer.querySelectorAll('div[role="button"][data-cy="commerce-tile"]');
+    if (offerButtons.length === 0) {
+      break;
+    }
+    offerButtons[0].click();
+    await sleep(config.delay * 2);
+
+    // Go back
+    const shadowHost = document.getElementById('mds-secondary-back-navbar');
+    const shadowRoot = shadowHost.shadowRoot;
+    const backButton = shadowRoot.querySelector('button#back-button');
+    backButton.click();
+
+    await sleep(config.delay * 5);
+  }
 }
 
 claimRewards();
